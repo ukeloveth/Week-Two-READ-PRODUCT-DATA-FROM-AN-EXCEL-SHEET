@@ -1,10 +1,12 @@
 package services;
 
 import models.Customer;
+import models.Staff;
 import models.Store;
+import servicesImpl.CashierServicesImpl;
 
 public interface CustomerServices {
-    void addProductToCart(Customer customer, Store store, int id);
+    void addProductToCart(Customer customer, Store store, int id,int quantity);
     void removeProductFromCart();
-    void checkout();
+    boolean checkout(Customer customer, CashierServicesImpl cashierServicesImpl, Store store);
 }

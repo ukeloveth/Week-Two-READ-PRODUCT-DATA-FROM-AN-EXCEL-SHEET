@@ -2,10 +2,7 @@ package servicesImpl;
 
 import enums.Role;
 import exceptions.StaffNotAuthorizedException;
-import models.Category;
-import models.Product;
-import models.Staff;
-import models.Store;
+import models.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -39,6 +36,7 @@ public class CashierServicesImpl implements CashierServices {
             XSSFWorkbook wb = new XSSFWorkbook(fis);
             XSSFSheet sheet = wb.getSheetAt(0);     //creating a Sheet object to retrieve object
             //iterating over Excel file
+            Product[] productsList = new Product[sheet.getLastRowNum()];
             for (int i = 1; i <= sheet.getLastRowNum() ; i++) {
                 XSSFRow row = sheet.getRow(i);
                 Product product = new Product();
@@ -68,9 +66,8 @@ public class CashierServicesImpl implements CashierServices {
                                         //System.out.println(cell.getStringCellValue());
                                         category.setDescription(cell.getStringCellValue());
                                         product.setCategory(category);
-                                        Product[] productList = store.getProductList();
-                                        productList[i-1] = product;
-                                        store.setProductList(productList);
+                                        productsList[i-1] = product;
+                                        store.setProductList(productsList);
                                         //System.out.println(store.getProductList());
                                         break;
                                     default :
@@ -104,12 +101,9 @@ public class CashierServicesImpl implements CashierServices {
     }
 
     @Override
-    public void validatePurchase() {
-
-    }
-
-    @Override
-    public void printReceipt() {
-
+    public void printReceipt(Integer customerId, Store store) {
+        List<TransactionData> transactionData = store.getTransactionHistory().get(customerId);
+        //transactionData.toString();
+        System.out.println(transactionData.get(transactionData.size() - 1));
     }
 }
