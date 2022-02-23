@@ -1,7 +1,7 @@
 package servicesImpl;
 
 import exceptions.CartIsEmptyException;
-import exceptions.ProductDoesNotExist;
+import exceptions.ProductDoesNotExistException;
 import exceptions.PurchaseCouldNotBeValidatedException;
 import exceptions.QuantityIsGreaterException;
 import models.*;
@@ -23,8 +23,8 @@ public class CustomerServicesImpl implements CustomerServices {
                 break;
             }
         }
-        if (foundProductInStore == null){
-            throw new ProductDoesNotExist("Product does not exist or is out of stock");
+        if (foundProductInStore == null || foundProductInStore.getQuantity() == 0){
+            throw new ProductDoesNotExistException("Product does not exist or is out of stock");
         }
         Product foundProductInCart = null;
         for (Product product : productListFromCart) {
@@ -34,33 +34,56 @@ public class CustomerServicesImpl implements CustomerServices {
             }
         }
         if (foundProductInCart != null){
-            if (quantity <= foundProductInStore.getQuantity()){
-                cartItems.put(foundProductInCart,foundProductInCart.getQuantity() + quantity);
-            }else {
-                throw new QuantityIsGreaterException("Quantity you are trying to add is greater than quantity in store");
-            }
-        }
-        if(!cartItems.isEmpty() && cartItems.containsKey(foundProductInStore)){
-            if (quantity <= foundProductInStore.getQuantity()){
-                int initialQuantity = cartItems.get(foundProductInStore);
+            if (foundProductInCart.getQuantity() <= foundProductInStore.getQuantity()){
+                int initialQuantity = cartItems.get(foundProductInCart);
                 int newQuantity = initialQuantity + quantity;
-                if (!(newQuantity >= foundProductInStore.getQuantity())){
+                if ((newQuantity <= foundProductInStore.getQuantity())){
                     cartItems.put(foundProductInStore,newQuantity);
-                }else{
-                    throw new QuantityIsGreaterException("Quantity you want to add is greater than quantity in store");
+                }else {
+                    throw new QuantityIsGreaterException("Quantity you are trying to add to 1cart is greater than quantity in store");
                 }
             }
         }
-        cartItems.put(foundProductInStore,quantity);
+        else{
+            if (quantity <= foundProductInStore.getQuantity()){
+                cartItems.put(foundProductInStore,quantity);
+            }else {
+                throw new QuantityIsGreaterException("Quantity you are trying to add to cart is greater than quantity in store");
+            }
+        }
     }
 
     @Override
-    public void removeProductFromCart() {
+    public void removeProductFromCart(Customer customer, int productId, int quantity) {
+        Map<Product,Integer> cartItems = customer.getCart();
+        if (cartItems.isEmpty()) {
+            throw new CartIsEmptyException("Cart is empty");
+        }
+        Product productToRemove = null;
+        for (Map.Entry<Product,Integer> item : cartItems.entrySet()){
+            if (item.getKey().getId() == productId) {
+                productToRemove = item.getKey();
+                break;
+            }
+        }
+        if (productToRemove != null) {
+            if ((cartItems.get(productToRemove) - quantity) >= 0) {
+                quantity = cartItems.get(productToRemove) - quantity;
+                cartItems.put(productToRemove,quantity);
+                customer.setCart(cartItems);
+                cartItems.remove(productToRemove,0);
+                System.out.println("Product has been removed");
+            }else{
+                throw new QuantityIsGreaterException("Quantity you want to remove is greater than quantity in cart");
 
+            }
+        }else{
+            throw new ProductDoesNotExistException("Product does not exist in the cart");
+        }
     }
 
     @Override
-    public boolean checkout(Customer customer, CashierServicesImpl cashierServicesImpl, Store store) {
+    public boolean checkout(Customer customer, Store store) {
         Map<Product,Integer> cartItems = customer.getCart();
         if (cartItems.isEmpty()) {
             throw new CartIsEmptyException("Cart is empty");
@@ -89,8 +112,13 @@ public class CustomerServicesImpl implements CustomerServices {
             listOfTransactions.add(transaction);
             transactionData.put(customer.getId(),listOfTransactions);
             store.setTransactionHistory(transactionData);
+        }else{
+            List<TransactionData> listOfTransactions = new ArrayList<>();
+            TransactionData transaction = new TransactionData(customer.getName(), LocalDateTime.now(),totalPrice);
+            listOfTransactions.add(transaction);
+            transactionData.put(customer.getId(),listOfTransactions);
+            store.setTransactionHistory(transactionData);
         }
-
         return true;
     }
 }

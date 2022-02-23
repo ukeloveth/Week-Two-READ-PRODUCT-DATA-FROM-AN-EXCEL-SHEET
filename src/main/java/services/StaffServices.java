@@ -1,5 +1,7 @@
 package services;
 
-public interface StaffServices {
-    void work();
+import models.Staff;
+
+public interface StaffServices{
+    void work(Staff staff);
 }

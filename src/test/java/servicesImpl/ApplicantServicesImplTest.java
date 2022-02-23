@@ -1,5 +1,7 @@
 package servicesImpl;
 
+import enums.Role;
+import exceptions.ApplicantAlreadyExistsException;
 import models.Applicant;
 import models.Store;
 
@@ -19,9 +21,16 @@ public class ApplicantServicesImplTest {
     }
 
     @org.junit.Test
-    public void shouldPassIfApplicantListIsNull() {
-        applicantServicesImpl1.apply(applicant1,store1);
+    public void shouldHireApplicantIfApplicantListIsNull() {
+        applicantServicesImpl1.apply(applicant1,store1, Role.CASHIER);
         assertEquals(1,store1.getApplicantList().size());
-        //assertTrue(store1.getApplicantList().contains(applicant2));
+    }
+
+    @org.junit.Test
+    public void shouldThrowApplicantAlreadyExistsExceptionIfApplicantAlreadyInTheList() {
+        applicantServicesImpl1.apply(applicant1,store1, Role.CASHIER);
+        assertThrows(ApplicantAlreadyExistsException.class,()->{
+            applicantServicesImpl1.apply(applicant1,store1, Role.CASHIER);
+        });
     }
 }

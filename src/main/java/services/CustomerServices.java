@@ -7,6 +7,6 @@ import servicesImpl.CashierServicesImpl;
 
 public interface CustomerServices {
     void addProductToCart(Customer customer, Store store, int id,int quantity);
-    void removeProductFromCart();
-    boolean checkout(Customer customer, CashierServicesImpl cashierServicesImpl, Store store);
+    void removeProductFromCart(Customer customer, int productId, int quantity);
+    boolean checkout(Customer customer, Store store);
 }
