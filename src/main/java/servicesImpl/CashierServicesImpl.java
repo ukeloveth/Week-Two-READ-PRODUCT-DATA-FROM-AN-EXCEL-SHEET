@@ -93,6 +93,11 @@ public class CashierServicesImpl implements CashierServices, StaffServices {
     }
 
     @Override
+    public void viewProductsByCategory(Staff staff, Store store) {
+
+    }
+
+    @Override
     public void printReceipt(Integer customerId, Store store) {
         List<TransactionData> transactionData = store.getTransactionHistory().get(customerId);
         System.out.println();

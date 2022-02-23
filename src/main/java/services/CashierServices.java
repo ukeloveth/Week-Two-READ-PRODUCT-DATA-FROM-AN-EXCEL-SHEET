@@ -10,5 +10,6 @@ import java.io.IOException;
 
 public interface CashierServices {
     void fetchProductFromStore(Staff staff, Store store, String filename) throws IOException;
+    void viewProductsByCategory(Staff staff, Store store);
     void printReceipt(Integer customerId, Store store);
 }
