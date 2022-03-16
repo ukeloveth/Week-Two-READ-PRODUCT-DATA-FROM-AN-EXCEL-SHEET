@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="decagon-wk1-tsk-convenienceStore-Revised" />
+        <module name="week_two_task" />
       </profile>
     </annotationProcessing>
   </component>
